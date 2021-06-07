@@ -17,18 +17,29 @@ export class AuthService {
   ) {}
 
   async login(payload: ISignInUserDto) {
-    const user = await this.usersService.findOne({ email: payload.email });
-    const isPasswordValid = bcrypt.compareSync(payload.password, user.password);
-    if (user && isPasswordValid) {
-      return {
-        email: user.email,
-        username: user.username,
-        access_token: this.jwtService.sign({
-          _id: user._id,
-        }),
-      };
+    try {
+      const user = await this.usersService.findOne({ email: payload.email });
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
+      const isPasswordValid = bcrypt.compareSync(
+        payload.password,
+        user.password,
+      );
+      if (isPasswordValid) {
+        return {
+          email: user.email,
+          username: user.username,
+          access_token: this.jwtService.sign({
+            _id: user._id,
+          }),
+        };
+      } else {
+        throw new UnauthorizedException('Invalid password');
+      }
+    } catch (e) {
+      throw new BadRequestException(e.message);
     }
-    throw new UnauthorizedException('Invalid password');
   }
 
   async createAccount(payload: ICreateUserDto) {
