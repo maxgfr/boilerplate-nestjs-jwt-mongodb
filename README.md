@@ -1,5 +1,12 @@
 # boilerplate-nestjs-jwt-mongodb
 
+## Init
+
+```sh
+yarn # to install dependencies
+cp .env.example .env # then set your own credentials
+```
+
 ## Commands
 
 ```sh
